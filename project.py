@@ -1,7 +1,9 @@
-########################################### Library Managemnet System ##################################################################
+###################################################### Library Management System #################################################################################
 from datetime import date
 import tkinter as tk
 from tkinter import ttk
+
+# Dictionaries for genres
 fiction = {"To Kill a Mockingbird": ["Available", "Harper Lee"],
 "The Great Gatsby": ["Available", "F. Scott Fitzgerald"],
 "1984": ["Available", "George Orwell"],
@@ -46,90 +48,63 @@ non_fi = {"Sapiens: A Brief History of Humankind":["Available", "Yuval Noah Hara
 "Thinking, Fast and Slow":["Available", "Daniel Kahneman"],
 "A Brief History of Time":["Available", "Stephen Hawking"]}
 
-gen = [fiction, mystery, sci_fi, non_fi] 
-# genre = input("Enter the Genre of book: ") #asks user to input genre 
-
+genres = {"fiction": fiction, "mystery": mystery, "sci-fi": sci_fi, "non-fiction": non_fi}
 
 # Initialize the main window
 root = tk.Tk()
-root.title("Dropdown Example")
-
-# Create a list of options
-genre = ["fiction", "sci-fi", "mystery", "non-fiction"] 
+root.title("Library Management System")
 
 # Create a variable to store the selected option
-selected_option = tk.StringVar(root)
-selected_option.set(genre[0])  # Set the default option
+selected_genre = tk.StringVar(root)
+selected_genre.set("fiction")  # Set the default option
 
-# Create the dropdown menu
-dropdown = tk.OptionMenu(root, selected_option, *genre)
+# Dropdown for genre selection
+dropdown = tk.OptionMenu(root, selected_genre, *genres.keys())
 dropdown.pack(pady=20)
 
-# Function to display the selected option
-def show_selection():
-    print("Selected option:", selected_option.get())
+# Function to display books based on selected genre
+def show_books():
+    genre_key = selected_genre.get()
+    books = genres.get(genre_key, {})
 
-# Button to confirm the selection
-button = tk.Button(root, text="Confirm Selection", command=show_selection)
+    # Create a new window for the selected genre
+    book_window = tk.Toplevel(root)
+    book_window.title(f"Library - {genre_key.capitalize()} Section")
+
+    # Treeview for displaying books
+    columns = ("Title", "Status", "Author")
+    tree = ttk.Treeview(book_window, columns=columns, show="headings")
+    tree.heading("Title", text="Title")
+    tree.heading("Status", text="Status")
+    tree.heading("Author", text="Author")
+    tree.column("Title", width=200)
+    tree.column("Status", width=100)
+    tree.column("Author", width=150)
+    tree.pack(expand=True, fill="both")
+
+    # Insert data into the Treeview
+    for title, details in books.items():
+        status, author = details
+        tree.insert("", "end", values=(title, status, author))
+
+# Button to confirm the selection and show books
+button = tk.Button(root, text="Show Books", command=show_books)
 button.pack(pady=10)
 
 root.mainloop()
 
-if genre == "fiction":
-    genre = gen[0]
-elif genre == "mystery":
-    genre = gen[1]
-elif genre == "sci-fi":
-    genre = gen[2]
-elif genre == "non-fi":
-    genre = gen[3]
-
-root = tk.Tk()
-root.title("Library - Fiction Section")
-
-# Create a Treeview widget with three columns: Title, Status, and Author
-columns = ("Title", "Status", "Author")
-tree = ttk.Treeview(root, columns=columns, show="headings")
-
-# Set up column headings
-tree.heading("Title", text="Title")
-tree.heading("Status", text="Status")
-tree.heading("Author", text="Author")
-
-# Set up column widths
-tree.column("Title", width=200)
-tree.column("Status", width=100)
-tree.column("Author", width=150)
-
-# Insert data from the dictionary into the Treeview
-for title, details in genre.items():
-    status, author = details
-    tree.insert("", "end", values=(title, status, author))
-
-# Pack the Treeview widget into the window
-tree.pack(expand=True, fill="both")
-
-# Run the Tkinter event loop
-root.mainloop()
-
-
-
-
-
-
-
-
-def book_manager(): #func for managing books
+# Fine calculation function
+def book_manager(days_difference):
     fine = 0
     if days_difference > 7:
-        fine+=10*days_difference
-        print("Your fine is: ₹",fine,"/-" )
+        fine += 10 * (days_difference - 7)
+        print("Your fine is: ₹", fine, "/-")
     else:
         print("The Book is returned successfully!")
 
+# Input and fine calculation
 issue_book = date(2024, int(input("Enter month of issue: ")), int(input("Enter date of issue: ")))
 return_book = date(2024, int(input("Enter month of return: ")), int(input('Enter date of return: ')))
 difference = return_book - issue_book
 days_difference = difference.days
-book_manager()
-
+book_manager(days_difference)
