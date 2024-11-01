@@ -1,5 +1,4 @@
 ########################################### Library Managemnet System ##################################################################
-# import pandas as pd
 from datetime import date
 import tkinter as tk
 from tkinter import ttk
@@ -47,8 +46,35 @@ non_fi = {"Sapiens: A Brief History of Humankind":["Available", "Yuval Noah Hara
 "Thinking, Fast and Slow":["Available", "Daniel Kahneman"],
 "A Brief History of Time":["Available", "Stephen Hawking"]}
 
-gen = [fiction, mystery, sci_fi, non_fi]
-genre = input("Enter the Genre of book: ")
+gen = [fiction, mystery, sci_fi, non_fi] 
+# genre = input("Enter the Genre of book: ") #asks user to input genre 
+
+
+# Initialize the main window
+root = tk.Tk()
+root.title("Dropdown Example")
+
+# Create a list of options
+genre = ["fiction", "sci-fi", "mystery", "non-fiction"] 
+
+# Create a variable to store the selected option
+selected_option = tk.StringVar(root)
+selected_option.set(genre[0])  # Set the default option
+
+# Create the dropdown menu
+dropdown = tk.OptionMenu(root, selected_option, *genre)
+dropdown.pack(pady=20)
+
+# Function to display the selected option
+def show_selection():
+    print("Selected option:", selected_option.get())
+
+# Button to confirm the selection
+button = tk.Button(root, text="Confirm Selection", command=show_selection)
+button.pack(pady=10)
+
+root.mainloop()
+
 if genre == "fiction":
     genre = gen[0]
 elif genre == "mystery":
@@ -88,19 +114,12 @@ root.mainloop()
 
 
 
-# Convert dictionary to DataFrame
-# data_frame = pd.DataFrame.from_dict([fiction, mystery, sci_fi, non_fi], orient='index', columns=["Availability", "Author"])
-
-# Reset the index to make the book titles a column
-# data_frame = data_frame.reset_index().rename(columns={"index": "Title"})
-# print(data_frame)
 
 
 
 
 
-
-def book_manager():
+def book_manager(): #func for managing books
     fine = 0
     if days_difference > 7:
         fine+=10*days_difference
