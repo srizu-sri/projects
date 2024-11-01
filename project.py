@@ -1,4 +1,5 @@
-###################################################### Library Management System #################################################################################
+
+####################################################### Library Management System ###############################################################################
 from datetime import date
 import tkinter as tk
 from tkinter import ttk
@@ -48,63 +49,97 @@ non_fi = {"Sapiens: A Brief History of Humankind":["Available", "Yuval Noah Hara
 "Thinking, Fast and Slow":["Available", "Daniel Kahneman"],
 "A Brief History of Time":["Available", "Stephen Hawking"]}
 
-genres = {"fiction": fiction, "mystery": mystery, "sci-fi": sci_fi, "non-fiction": non_fi}
+
+genres = {"Fiction": fiction, "Mystery": mystery, "Sci-Fi": sci_fi, "Non-Fiction": non_fi}
 
 # Initialize the main window
 root = tk.Tk()
 root.title("Library Management System")
+root.geometry("600x400")
 
-# Create a variable to store the selected option
-selected_genre = tk.StringVar(root)
-selected_genre.set("fiction")  # Set the default option
+# Create a Notebook widget for tabs
+notebook = ttk.Notebook(root)
+notebook.pack(expand=True, fill="both")
 
-# Dropdown for genre selection
-dropdown = tk.OptionMenu(root, selected_genre, *genres.keys())
-dropdown.pack(pady=20)
+# Library Tab
+library_tab = ttk.Frame(notebook)
+notebook.add(library_tab, text="Library")
 
-# Function to display books based on selected genre
+# Fine Calculator Tab
+fine_calculator_tab = ttk.Frame(notebook)
+notebook.add(fine_calculator_tab, text="Fine Calculator")
+
+# ---- Library Section ----
+selected_genre = tk.StringVar(library_tab)
+selected_genre.set("Fiction")
+
+# Dropdown for genre selection in Library Tab
+genre_label = tk.Label(library_tab, text="Select Genre:")
+genre_label.pack(pady=10)
+dropdown = tk.OptionMenu(library_tab, selected_genre, *genres.keys())
+dropdown.pack(pady=10)
+
+# Treeview to display books
+columns = ("Title", "Status", "Author")
+tree = ttk.Treeview(library_tab, columns=columns, show="headings")
+tree.heading("Title", text="Title")
+tree.heading("Status", text="Status")
+tree.heading("Author", text="Author")
+tree.column("Title", width=200)
+tree.column("Status", width=100)
+tree.column("Author", width=150)
+tree.pack(expand=True, fill="both")
+
+# Function to show books based on selected genre
 def show_books():
+    # Clear existing items
+    for item in tree.get_children():
+        tree.delete(item)
+    
+    # Display books for the selected genre
     genre_key = selected_genre.get()
     books = genres.get(genre_key, {})
-
-    # Create a new window for the selected genre
-    book_window = tk.Toplevel(root)
-    book_window.title(f"Library - {genre_key.capitalize()} Section")
-
-    # Treeview for displaying books
-    columns = ("Title", "Status", "Author")
-    tree = ttk.Treeview(book_window, columns=columns, show="headings")
-    tree.heading("Title", text="Title")
-    tree.heading("Status", text="Status")
-    tree.heading("Author", text="Author")
-    tree.column("Title", width=200)
-    tree.column("Status", width=100)
-    tree.column("Author", width=150)
-    tree.pack(expand=True, fill="both")
-
-    # Insert data into the Treeview
+    
     for title, details in books.items():
         status, author = details
         tree.insert("", "end", values=(title, status, author))
 
-# Button to confirm the selection and show books
-button = tk.Button(root, text="Show Books", command=show_books)
-button.pack(pady=10)
+# Button to show books
+show_books_button = tk.Button(library_tab, text="Show Books", command=show_books)
+show_books_button.pack(pady=10)
+
+# ---- Fine Calculator Section ----
+# Labels and inputs for Fine Calculator in Fine Calculator Tab
+issue_label = tk.Label(fine_calculator_tab, text="Enter Issue Date (yyyy-mm-dd):")
+issue_label.pack(pady=5)
+issue_entry = tk.Entry(fine_calculator_tab)
+issue_entry.pack(pady=5)
+
+return_label = tk.Label(fine_calculator_tab, text="Enter Return Date (yyyy-mm-dd):")
+return_label.pack(pady=5)
+return_entry = tk.Entry(fine_calculator_tab)
+return_entry.pack(pady=5)
+
+fine_label = tk.Label(fine_calculator_tab, text="Fine: ₹0", font=("Arial", 12))
+fine_label.pack(pady=10)
+
+# Function to calculate fine
+def calculate_fine():
+    try:
+        issue_date = date.fromisoformat(issue_entry.get())
+        return_date = date.fromisoformat(return_entry.get())
+        days_difference = (return_date - issue_date).days
+        
+        if days_difference > 7:
+            fine = 10 * (days_difference - 7)
+            fine_label.config(text=f"Fine: ₹{fine}")
+        else:
+            fine_label.config(text="The book is returned successfully! No fine.")
+    except ValueError:
+        fine_label.config(text="Invalid date format. Please enter yyyy-mm-dd.")
+
+# Button to calculate fine
+calculate_button = tk.Button(fine_calculator_tab, text="Calculate Fine", command=calculate_fine)
+calculate_button.pack(pady=10)
 
 root.mainloop()
-
-# Fine calculation function
-def book_manager(days_difference):
-    fine = 0
-    if days_difference > 7:
-        fine += 10 * (days_difference - 7)
-        print("Your fine is: ₹", fine, "/-")
-    else:
-        print("The Book is returned successfully!")
-
-# Input and fine calculation
-issue_book = date(2024, int(input("Enter month of issue: ")), int(input("Enter date of issue: ")))
-return_book = date(2024, int(input("Enter month of return: ")), int(input('Enter date of return: ')))
-difference = return_book - issue_book
-days_difference = difference.days
-book_manager(days_difference)
