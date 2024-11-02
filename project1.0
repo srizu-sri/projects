@@ -1,0 +1,218 @@
+from datetime import date
+import tkinter as tk
+from tkinter import ttk
+from tkinter import PhotoImage 
+
+# Dictionaries for genres
+fiction = {"To Kill a Mockingbird": ["Available", "Harper Lee"],
+"The Great Gatsby": ["Available", "F. Scott Fitzgerald"],
+"1984": ["Available", "George Orwell"],
+"The Catcher in the Rye": ["Available", "J.D. Salinger"],
+"Pride and Prejudice": ["Available","Jane Austen"],
+"The Book Thief":["Available","Markus Zusak"],
+"One Hundred Years of Solitude":["Available", "Gabriel García Márquez"],
+"The Road":["Available", "Cormac McCarthy"],
+"Little Women":["Available","Louisa May Alcott"],
+"Beloved":["Available", "Toni Morrison"]}
+
+mystery = {"Gone Girl":["Available", "Gillian Flynn"] ,
+"The Girl with the Dragon Tattoo":["Available", "Stieg Larsson"],
+"The Da Vinci Code":["Available","Dan Brown"],
+"Sherlock Holmes: The Complete Novels and Stories":["Available","Arthur Conan Doyle"],
+"Big Little Lies":["Available","Liane Moriarty"],
+"The Silent Patient":["Available","Alex Michaelides"],
+"In the Woods":["Available","Tana French"],
+"The Woman in the Window":["Available","A.J. Finn"],
+"And Then There Were None":["Available","Agatha Christie"],
+"The Girl on the Train":["Available", "Paula Hawkins"]}
+
+sci_fi = {"Dune":["Available","Frank Herbert"],
+"The Hobbit":["Available","J.R.R. Tolkien"],
+"Harry Potter and the Sorcerer's Stone":["Available","J.K. Rowling"],
+"Ender's Game":["Available","Orson Scott Card"],
+"The Name of the Wind":["Available","Patrick Rothfuss"],
+"The Fellowship of the Ring":["Available","J.R.R. Tolkien"],
+"A Game of Thrones by George":["Available","R.R. Martin"],
+"The Left Hand of Darkness":["Available", "Ursula K. Le Guin"],
+"The Martian":["Available","Andy Weir"],
+"Neuromancer":["Available", "William Gibson"]}
+
+non_fi = {"Sapiens: A Brief History of Humankind":["Available", "Yuval Noah Harari"],
+"Educated":["Available","Tara Westover"],
+"Becoming":["Available","Michelle Obama"],
+"The Immortal Life of Henrietta Lacks":["Available","Rebecca Skloot"],
+"Into the Wild":["Available", "Jon Krakauer"],
+"The Wright Brothers":["Available", "David McCullough"],
+"Unbroken":["Available", "Laura Hillenbrand"],
+"Quiet: The Power of Introverts in a World That Can't Stop Talking":["Available", "Susan Cain"],
+"Thinking, Fast and Slow":["Available", "Daniel Kahneman"],
+"A Brief History of Time":["Available", "Stephen Hawking"]}
+
+
+genres = {"Fiction": fiction, "Mystery": mystery, "Sci-Fi": sci_fi, "Non-Fiction": non_fi}
+
+# Initialize the main window
+root = tk.Tk()
+root.title("Library Management System")
+root.geometry("600x400") #Gives geometry to the window
+
+
+# Create a Notebook widget for tabs
+notebook = ttk.Notebook(root)
+notebook.pack(expand=True, fill="both")
+
+# Library Tab
+library_tab = ttk.Frame(notebook)
+notebook.add(library_tab, text="Library")
+
+# Fine Calculator Tab
+fine_calculator_tab = ttk.Frame(notebook)
+notebook.add(fine_calculator_tab, text="Fine Calculator")
+
+# New book Tab
+addbook_tab = ttk.Frame(notebook)
+notebook.add(addbook_tab, text="Add Books")
+
+
+# ---- Library Section ----
+selected_genre = tk.StringVar(library_tab)
+selected_genre.set("Fiction")
+
+# Dropdown for genre selection in Library Tab
+genre_label = tk.Label(library_tab, text="Select Genre:")
+genre_label.pack(pady=10)
+dropdown = tk.OptionMenu(library_tab, selected_genre, *genres.keys())
+dropdown.pack(pady=10)
+
+# Treeview to display books
+columns = ("Title", "Status", "Author")
+tree = ttk.Treeview(library_tab, columns=columns, show="headings")
+tree.heading("Title", text="Title")
+tree.heading("Status", text="Status")
+tree.heading("Author", text="Author")
+tree.column("Title", width=200)
+tree.column("Status", width=100)
+tree.column("Author", width=150)
+tree.pack(expand=True, fill="both")
+
+# Function to show books based on selected genre
+def show_books():
+    # Clear existing items
+    for item in tree.get_children():
+        tree.delete(item)
+    
+    # Display books for the selected genre
+    genre_key = selected_genre.get()
+    books = genres.get(genre_key, {})
+    
+    for title, details in books.items():
+        status, author = details
+        tree.insert("", "end", values=(title, status, author))
+
+# Button to show books
+show_books_button = tk.Button(library_tab, text="Show Books", command=show_books)
+show_books_button.pack(pady=10)
+
+# ---- Fine Calculator Section ----
+# Labels and inputs for Fine Calculator in Fine Calculator Tab
+issue_label = tk.Label(fine_calculator_tab, text="Enter Issue Date (yyyy-mm-dd):")
+issue_label.pack(pady=5)
+issue_entry = tk.Entry(fine_calculator_tab)
+issue_entry.pack(pady=5)
+
+return_label = tk.Label(fine_calculator_tab, text="Enter Return Date (yyyy-mm-dd):")
+return_label.pack(pady=5)
+return_entry = tk.Entry(fine_calculator_tab)
+return_entry.pack(pady=5)
+
+fine_label = tk.Label(fine_calculator_tab, text="Fine: ₹0", font=("Arial", 12))
+fine_label.pack(pady=10)
+
+
+# Input box for genre of the book
+new_books_genre = tk.Label(addbook_tab, text="Enter genre of the book")
+new_books_genre.pack(pady=5)
+new_books_genre_entry = tk.Entry(addbook_tab)
+new_books_genre_entry.pack(pady=5)
+
+# Input Box for new book
+new_books = tk.Label(addbook_tab, text="Enter name of the book")
+new_books.pack(pady=5)
+new_books_entry = tk.Entry(addbook_tab)
+new_books_entry.pack(pady=5)
+
+# Input box for author of the book
+new_books_author = tk.Label(addbook_tab, text="Enter name of the Author")
+new_books_author.pack(pady=5)
+new_books_author_entry = tk.Entry(addbook_tab)
+new_books_author_entry.pack(pady=5)
+
+# Input box for Status of the book
+new_books_status = tk.Label(addbook_tab, text="Enter Status of the book")
+new_books_status.pack(pady=5)
+new_books_status_entry = tk.Entry(addbook_tab)
+new_books_status_entry.pack(pady=5)
+
+# Adding the Add Book button to addbook_tab
+add_newbooks_button = tk.Button(addbook_tab, text="Add Book", command=addbook_tab)
+add_newbooks_button.pack(pady=10)
+
+# def add_books():
+#     # Get values from entry fields
+#     genre = new_books_genre_entry.get().strip()
+#     title = new_books_entry.get().strip()
+#     author = new_books_author_entry.get().strip()
+#     status = new_books_status_entry.get().strip()
+
+#     # Check if inputs are valid
+#     if not (genre and title and author and status):
+#         print("Please fill out all fields.")
+#         return
+
+#     # Check if the genre exists in the genres dictionary
+#     if genre in genres:
+#         # Check if the book already exists within the genre
+#         if title in genres[genre]:
+#             # Update book's details if it exists
+#             genres[genre][title] = [status, author]
+#             print(f"Updated book '{title}' in genre '{genre}' with new status '{status}' and author '{author}'.")
+#         else:
+#             # Add new book to the genre if it doesn't exist
+#             genres[genre][title] = [status, author]
+#             print(f"Book '{title}' added to genre '{genre}' with status '{status}' and author '{author}'.")
+#     else:
+#         # Create a new genre and add the book
+#         genres[genre] = {title: [status, author]}
+#         print(f"New genre '{genre}' created. Book '{title}' added with status '{status}' and author '{author}'.")
+
+#     # Clear the input fields after adding or updating
+#     new_books_genre_entry.delete(0, tk.END)
+#     new_books_entry.delete(0, tk.END)
+#     new_books_author_entry.delete(0, tk.END)
+#     new_books_status_entry.delete(0, tk.END)
+
+#     # Update the Treeview to show the newly added or updated book
+
+
+
+
+# Function to calculate fine
+def calculate_fine():
+    try:
+        issue_date = date.fromisoformat(issue_entry.get())
+        return_date = date.fromisoformat(return_entry.get())
+        days_difference = (return_date - issue_date).days
+        
+        if days_difference > 7:
+            fine = 10 * (days_difference - 7)
+            fine_label.config(text=f"Fine: ₹{fine}")
+        else:
+            fine_label.config(text="The book is returned successfully! No fine.")
+    except ValueError:
+        fine_label.config(text="Invalid date format. Please enter yyyy-mm-dd.")
+
+# Button to calculate fine
+calculate_button = tk.Button(fine_calculator_tab, text="Calculate Fine", command=calculate_fine)
+calculate_button.pack(pady=10)
+
+root.mainloop()
