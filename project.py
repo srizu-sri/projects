@@ -1,8 +1,10 @@
+############################################# Library Management System ##############################################################
 
-####################################################### Library Management System ###############################################################################
 from datetime import date
 import tkinter as tk
 from tkinter import ttk
+
+
 
 # Dictionaries for genres
 fiction = {"To Kill a Mockingbird": ["Available", "Harper Lee"],
@@ -55,7 +57,8 @@ genres = {"Fiction": fiction, "Mystery": mystery, "Sci-Fi": sci_fi, "Non-Fiction
 # Initialize the main window
 root = tk.Tk()
 root.title("Library Management System")
-root.geometry("600x400")
+root.geometry("600x400") #Gives geometry to the window
+
 
 # Create a Notebook widget for tabs
 notebook = ttk.Notebook(root)
@@ -69,6 +72,11 @@ notebook.add(library_tab, text="Library")
 fine_calculator_tab = ttk.Frame(notebook)
 notebook.add(fine_calculator_tab, text="Fine Calculator")
 
+# New book Tab
+addbook_tab = ttk.Frame(notebook)
+notebook.add(addbook_tab, text="Add Books")
+
+
 # ---- Library Section ----
 selected_genre = tk.StringVar(library_tab)
 selected_genre.set("Fiction")
@@ -76,13 +84,13 @@ selected_genre.set("Fiction")
 # Dropdown for genre selection in Library Tab
 genre_label = tk.Label(library_tab, text="Select Genre:")
 genre_label.pack(pady=10)
-dropdown = tk.OptionMenu(library_tab, selected_genre, *genres.keys())
+dropdown = tk.OptionMenu(library_tab, selected_genre, *genres.keys()) #generates a dropdown list. 
 dropdown.pack(pady=10)
 
 # Treeview to display books
-columns = ("Title", "Status", "Author")
+columns = ("Title", "Status", "Author") #genetrates 3 columns with the respective names. 
 tree = ttk.Treeview(library_tab, columns=columns, show="headings")
-tree.heading("Title", text="Title")
+tree.heading("Title", text="Title") #adds heading to the table/tree
 tree.heading("Status", text="Status")
 tree.heading("Author", text="Author")
 tree.column("Title", width=200)
@@ -110,18 +118,52 @@ show_books_button.pack(pady=10)
 
 # ---- Fine Calculator Section ----
 # Labels and inputs for Fine Calculator in Fine Calculator Tab
-issue_label = tk.Label(fine_calculator_tab, text="Enter Issue Date (yyyy-mm-dd):")
+issue_label = tk.Label(fine_calculator_tab, text="Enter Issue Date (yyyy-mm-dd):") #adds label for the user-input field
 issue_label.pack(pady=5)
-issue_entry = tk.Entry(fine_calculator_tab)
+issue_entry = tk.Entry(fine_calculator_tab) #generates an input box for user
 issue_entry.pack(pady=5)
 
-return_label = tk.Label(fine_calculator_tab, text="Enter Return Date (yyyy-mm-dd):")
+return_label = tk.Label(fine_calculator_tab, text="Enter Return Date (yyyy-mm-dd):") #adds label for the user-input field
 return_label.pack(pady=5)
-return_entry = tk.Entry(fine_calculator_tab)
+return_entry = tk.Entry(fine_calculator_tab) #generates an input box for user
 return_entry.pack(pady=5)
 
-fine_label = tk.Label(fine_calculator_tab, text="Fine: ₹0", font=("Arial", 12))
+fine_label = tk.Label(fine_calculator_tab, text="Fine: ₹0", font=("Arial", 12)) #adds label for the user-input field
 fine_label.pack(pady=10)
+
+
+# Input box for genre of new book
+new_books_genre = tk.Label(addbook_tab, text="Enter genre of the book") #adds label for the user-input field
+new_books_genre.pack(pady=5)
+new_books_genre_entry = tk.Entry(addbook_tab) #generates an input box for user
+new_books_genre_entry.pack(pady=5)
+
+# Input Box for new book
+new_books = tk.Label(addbook_tab, text="Enter name of the book") #adds label for the user-input field
+new_books.pack(pady=5)
+new_books_entry = tk.Entry(addbook_tab) #generates an input box for user
+new_books_entry.pack(pady=5)
+
+# Input box for author of the book
+new_books_author = tk.Label(addbook_tab, text="Enter name of the Author") #adds label for the user-input field
+new_books_author.pack(pady=5)
+new_books_author_entry = tk.Entry(addbook_tab) #generates an input box for user
+new_books_author_entry.pack(pady=5)
+
+# Input box for Status of the book
+new_books_status = tk.Label(addbook_tab, text="Enter Status of the book") #adds label for the user-input field
+new_books_status.pack(pady=5)
+new_books_status_entry = tk.Entry(addbook_tab) #generates an input box for user
+new_books_status_entry.pack(pady=5)
+
+
+def add_books():
+    new_books_genre_entry.update({new_books_entry: [new_books_status_entry,new_books_author_entry]})
+
+
+add_newbooks_button = tk.Button(addbook_tab, text="Add Book", command=add_books)
+add_newbooks_button.pack(pady=10)
+
 
 # Function to calculate fine
 def calculate_fine():
