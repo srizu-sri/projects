@@ -1,5 +1,4 @@
-########################################################## Library Management System ###################################################################################
-
+#################################################### Library Management System ##########################################################
 
 from datetime import date
 import tkinter as tk
@@ -67,7 +66,7 @@ notebook.pack(expand=True, fill="both")
 library_tab = ttk.Frame(notebook)
 notebook.add(library_tab, text="Library")
 
-# ---- Library Section ----
+# # ---- Library Section ----
 selected_genre = tk.StringVar(library_tab)
 selected_genre.set("Fiction")
 
@@ -105,7 +104,7 @@ def show_books():
         status = "Available" if availability > 0 else "Unavailable"
         tree.insert("", "end", values=(title, author, availability, status))
 
-# Fine Calculator Tab
+# # Fine Calculator Tab
 fine_calculator_tab = ttk.Frame(notebook)
 notebook.add(fine_calculator_tab, text="Fine Calculator")
 
