@@ -1,64 +1,88 @@
 ############################################# Library Management System ##############################################################
 
+import openpyxl
+from openpyxl import Workbook
 from datetime import date
 import tkinter as tk
 from tkinter import ttk
-
-
+from tkinter import messagebox
 
 # Dictionaries for genres
-fiction = {"To Kill a Mockingbird": ["Available", "Harper Lee"],
-"The Great Gatsby": ["Available", "F. Scott Fitzgerald"],
-"1984": ["Available", "George Orwell"],
-"The Catcher in the Rye": ["Available", "J.D. Salinger"],
-"Pride and Prejudice": ["Available","Jane Austen"],
-"The Book Thief":["Available","Markus Zusak"],
-"One Hundred Years of Solitude":["Available", "Gabriel García Márquez"],
-"The Road":["Available", "Cormac McCarthy"],
-"Little Women":["Available","Louisa May Alcott"],
-"Beloved":["Available", "Toni Morrison"]}
+fiction = {"To Kill a Mockingbird": ["Harper Lee", 10],
+"The Great Gatsby": ["F. Scott Fitzgerald", 10],
+"1984": ["George Orwell", 10],
+"The Catcher in the Rye": ["J.D. Salinger", 10],
+"Pride and Prejudice": ["Jane Austen", 10],
+"The Book Thief":["Markus Zusak", 10],
+"One Hundred Years of Solitude":["Gabriel García Márquez", 10],
+"The Road":["Cormac McCarthy", 10],
+"Little Women":["Louisa May Alcott", 10],
+"Beloved":["Toni Morrison", 10]}
 
-mystery = {"Gone Girl":["Available", "Gillian Flynn"] ,
-"The Girl with the Dragon Tattoo":["Available", "Stieg Larsson"],
-"The Da Vinci Code":["Available","Dan Brown"],
-"Sherlock Holmes: The Complete Novels and Stories":["Available","Arthur Conan Doyle"],
-"Big Little Lies":["Available","Liane Moriarty"],
-"The Silent Patient":["Available","Alex Michaelides"],
-"In the Woods":["Available","Tana French"],
-"The Woman in the Window":["Available","A.J. Finn"],
-"And Then There Were None":["Available","Agatha Christie"],
-"The Girl on the Train":["Available", "Paula Hawkins"]}
+mystery = {"Gone Girl":["Gillian Flynn", 10] ,
+"The Girl with the Dragon Tattoo":["Stieg Larsson", 10],
+"The Da Vinci Code":["Dan Brown", 10],
+"Sherlock Holmes: The Complete Novels and Stories":["Arthur Conan Doyle", 10],
+"Big Little Lies":["Liane Moriarty", 10],
+"The Silent Patient":["Alex Michaelides", 10],
+"In the Woods":["Tana French", 10],
+"The Woman in the Window":["A.J. Finn", 10],
+"And Then There Were None":["Agatha Christie", 10],
+"The Girl on the Train":["Paula Hawkins", 10]}
 
-sci_fi = {"Dune":["Available","Frank Herbert"],
-"The Hobbit":["Available","J.R.R. Tolkien"],
-"Harry Potter and the Sorcerer's Stone":["Available","J.K. Rowling"],
-"Ender's Game":["Available","Orson Scott Card"],
-"The Name of the Wind":["Available","Patrick Rothfuss"],
-"The Fellowship of the Ring":["Available","J.R.R. Tolkien"],
-"A Game of Thrones by George":["Available","R.R. Martin"],
-"The Left Hand of Darkness":["Available", "Ursula K. Le Guin"],
-"The Martian":["Available","Andy Weir"],
-"Neuromancer":["Available", "William Gibson"]}
+sci_fi = {"Dune":["Frank Herbert", 10],
+"The Hobbit":["J.R.R. Tolkien", 10],
+"Harry Potter and the Sorcerer's Stone":["J.K. Rowling", 10],
+"Ender's Game":["Orson Scott Card", 10],
+"The Name of the Wind":["Patrick Rothfuss", 10],
+"The Fellowship of the Ring":["J.R.R. Tolkien", 10],
+"A Game of Thrones by George":["R.R. Martin", 10],
+"The Left Hand of Darkness":["Ursula K. Le Guin", 10],
+"The Martian":["Andy Weir", 10],
+"Neuromancer":["William Gibson", 10]}
 
-non_fi = {"Sapiens: A Brief History of Humankind":["Available", "Yuval Noah Harari"],
-"Educated":["Available","Tara Westover"],
-"Becoming":["Available","Michelle Obama"],
-"The Immortal Life of Henrietta Lacks":["Available","Rebecca Skloot"],
-"Into the Wild":["Available", "Jon Krakauer"],
-"The Wright Brothers":["Available", "David McCullough"],
-"Unbroken":["Available", "Laura Hillenbrand"],
-"Quiet: The Power of Introverts in a World That Can't Stop Talking":["Available", "Susan Cain"],
-"Thinking, Fast and Slow":["Available", "Daniel Kahneman"],
-"A Brief History of Time":["Available", "Stephen Hawking"]}
+non_fi = {"Sapiens: A Brief History of Humankind":["Yuval Noah Harari", 10], 
+"Educated":["Tara Westover", 10],
+"Becoming":["Michelle Obama", 10],
+"The Immortal Life of Henrietta Lacks":["Rebecca Skloot", 10],
+"Into the Wild":["Jon Krakauer", 10],
+"The Wright Brothers":["David McCullough", 10],
+"Unbroken":["Laura Hillenbrand", 10],
+"Quiet: The Power of Introverts in a World That Can't Stop Talking":["Susan Cain", 10],
+"Thinking, Fast and Slow":["Daniel Kahneman", 10],
+"A Brief History of Time":["Stephen Hawking", 10]}
 
 
 genres = {"Fiction": fiction, "Mystery": mystery, "Sci-Fi": sci_fi, "Non-Fiction": non_fi}
 
-# Initialize the main window
+# Initialize Excel file
+excel_file = "IssuedBooks.xlsx"
+
+# Function to initialize the Excel file if it doesn't exist
+def initialize_excel():
+    try:
+        wb = openpyxl.load_workbook(excel_file)
+    except FileNotFoundError:
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Issued Books"
+        ws.append(["Name", "Email", "Book Title", "Date of Issue"])  # Add headers
+        wb.save(excel_file)
+
+initialize_excel()
+
+# Function to save issuer's details to Excel
+def save_to_excel(name, email, title):
+    wb = openpyxl.load_workbook(excel_file)
+    ws = wb["Issued Books"]
+    ws.append([name, email, title, date.today().strftime("%Y-%m-%d")])
+    wb.save(excel_file)
+
+# ---- Existing Code ----
+
 root = tk.Tk()
 root.title("Library Management System")
-root.geometry("600x400") #Gives geometry to the window
-
+root.geometry("700x500")
 
 # Create a Notebook widget for tabs
 notebook = ttk.Notebook(root)
@@ -68,34 +92,27 @@ notebook.pack(expand=True, fill="both")
 library_tab = ttk.Frame(notebook)
 notebook.add(library_tab, text="Library")
 
-# Fine Calculator Tab
-fine_calculator_tab = ttk.Frame(notebook)
-notebook.add(fine_calculator_tab, text="Fine Calculator")
-
-# New book Tab
-addbook_tab = ttk.Frame(notebook)
-notebook.add(addbook_tab, text="Add Books")
-
-
-# ---- Library Section ----
+# # ---- Library Section ----
 selected_genre = tk.StringVar(library_tab)
 selected_genre.set("Fiction")
 
 # Dropdown for genre selection in Library Tab
 genre_label = tk.Label(library_tab, text="Select Genre:")
 genre_label.pack(pady=10)
-dropdown = tk.OptionMenu(library_tab, selected_genre, *genres.keys()) #generates a dropdown list. 
+dropdown = tk.OptionMenu(library_tab, selected_genre, *genres.keys())
 dropdown.pack(pady=10)
 
 # Treeview to display books
-columns = ("Title", "Status", "Author") #genetrates 3 columns with the respective names. 
+columns = ("Title", "Author", "Availability", "Status")
 tree = ttk.Treeview(library_tab, columns=columns, show="headings")
-tree.heading("Title", text="Title") #adds heading to the table/tree
-tree.heading("Status", text="Status")
+tree.heading("Title", text="Title")
 tree.heading("Author", text="Author")
+tree.heading("Availability", text="Availability")
+tree.heading("Status", text="Status")
 tree.column("Title", width=200)
-tree.column("Status", width=100)
 tree.column("Author", width=150)
+tree.column("Availability", width=100)
+tree.column("Status", width=100)
 tree.pack(expand=True, fill="both")
 
 # Function to show books based on selected genre
@@ -103,19 +120,74 @@ def show_books():
     # Clear existing items
     for item in tree.get_children():
         tree.delete(item)
-    
+
     # Display books for the selected genre
     genre_key = selected_genre.get()
     books = genres.get(genre_key, {})
-    
+
     for title, details in books.items():
-        status, author = details
-        tree.insert("", "end", values=(title, status, author))
+        author, availability = details
+        status = "Available" if availability > 0 else "Unavailable"
+        tree.insert("", "end", values=(title, author, availability, status))
+
+# # Fine Calculator Tab
+fine_calculator_tab = ttk.Frame(notebook)
+notebook.add(fine_calculator_tab, text="Fine Calculator")
+
 
 # Button to show books
 show_books_button = tk.Button(library_tab, text="Show Books", command=show_books)
 show_books_button.pack(pady=10)
 
+# Function to issue a book
+def issue_book():
+    selected_item = tree.selection()
+    if not selected_item:
+        messagebox.showerror("Error", "Please select a book to issue.")
+        return
+
+    item_values = tree.item(selected_item[0], "values")
+    title = item_values[0]
+    genre_key = selected_genre.get()
+    books = genres.get(genre_key, {})
+
+    if books[title][1] > 0:  # Check availability
+        books[title][1] -= 1
+        messagebox.showinfo("Issue Book", f"{title} has been issued successfully!")
+
+        # Prompt window for user details
+        def save_details():
+            name = name_entry.get()
+            email = email_entry.get()
+            save_to_excel(name, email, title)  # Save details to Excel
+            messagebox.showinfo("Details Saved", f"Issued to: {name}, {email}")
+            issue_window.destroy()
+
+        issue_window = tk.Toplevel(root)
+        issue_window.title("Enter Details")
+        issue_window.geometry("300x200")
+
+        tk.Label(issue_window, text="Enter Name:").pack(pady=5)
+        name_entry = tk.Entry(issue_window)
+        name_entry.pack(pady=5)
+
+        tk.Label(issue_window, text="Enter Email:").pack(pady=5)
+        email_entry = tk.Entry(issue_window)
+        email_entry.pack(pady=5)
+
+        save_button = tk.Button(issue_window, text="Save Details", command=save_details)
+        save_button.pack(pady=10)
+    else:
+        messagebox.showwarning("Unavailable", "This book is currently unavailable.")
+
+    show_books()
+
+# Add Issue Button
+issue_button = tk.Button(library_tab, text="Issue Selected Book", command=issue_book)
+issue_button.pack(pady=10)
+
+# Initially show books
+show_books()
 # ---- Fine Calculator Section ----
 # Labels and inputs for Fine Calculator in Fine Calculator Tab
 issue_label = tk.Label(fine_calculator_tab, text="Enter Issue Date (yyyy-mm-dd):") #adds label for the user-input field
@@ -131,41 +203,6 @@ return_entry.pack(pady=5)
 fine_label = tk.Label(fine_calculator_tab, text="Fine: ₹0", font=("Arial", 12)) #adds label for the user-input field
 fine_label.pack(pady=10)
 
-
-# Input box for genre of new book
-new_books_genre = tk.Label(addbook_tab, text="Enter genre of the book") #adds label for the user-input field
-new_books_genre.pack(pady=5)
-new_books_genre_entry = tk.Entry(addbook_tab) #generates an input box for user
-new_books_genre_entry.pack(pady=5)
-
-# Input Box for new book
-new_books = tk.Label(addbook_tab, text="Enter name of the book") #adds label for the user-input field
-new_books.pack(pady=5)
-new_books_entry = tk.Entry(addbook_tab) #generates an input box for user
-new_books_entry.pack(pady=5)
-
-# Input box for author of the book
-new_books_author = tk.Label(addbook_tab, text="Enter name of the Author") #adds label for the user-input field
-new_books_author.pack(pady=5)
-new_books_author_entry = tk.Entry(addbook_tab) #generates an input box for user
-new_books_author_entry.pack(pady=5)
-
-# Input box for Status of the book
-new_books_status = tk.Label(addbook_tab, text="Enter Status of the book") #adds label for the user-input field
-new_books_status.pack(pady=5)
-new_books_status_entry = tk.Entry(addbook_tab) #generates an input box for user
-new_books_status_entry.pack(pady=5)
-
-
-def add_books():
-    new_books_genre_entry.update({new_books_entry: [new_books_status_entry,new_books_author_entry]})
-
-
-add_newbooks_button = tk.Button(addbook_tab, text="Add Book", command=add_books)
-add_newbooks_button.pack(pady=10)
-
-
-# Function to calculate fine
 def calculate_fine():
     try:
         issue_date = date.fromisoformat(issue_entry.get())
@@ -183,5 +220,6 @@ def calculate_fine():
 # Button to calculate fine
 calculate_button = tk.Button(fine_calculator_tab, text="Calculate Fine", command=calculate_fine)
 calculate_button.pack(pady=10)
+
 
 root.mainloop()
