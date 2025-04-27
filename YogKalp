@@ -1098,6 +1098,7 @@ class VoiceAssistant:
                 pass
             except Exception as e:
                 print(f"Speech error: {e}") 
+
     def speak(self, message):
         """Add message to speech queue"""
         if self.voice_enabled:
@@ -1118,6 +1119,8 @@ class IndianFoodRecommendations(QWidget):
         self.setWindowTitle("YogKalp - Indian Food Recommendations")
         self.setMinimumSize(800, 600)
         self.bmi = bmi
+        self.voice_assistant = VoiceAssistant()
+
         self.setup_ui()
         
     def setup_ui(self):
@@ -1236,6 +1239,7 @@ class IndianFoodRecommendations(QWidget):
     def get_recommendations(self):
         if self.bmi < 18.5:
             return {
+                
                 "High-Calorie Main Courses": [
                     {
                         "name": "Ghee Rice with Dal Makhani",
@@ -1587,8 +1591,7 @@ class ModernYogaApp(QMainWindow):
         self.current_batch_complete = False  # Track if current batch is complete
         
         # Initialize user profile data
-        self.user_profile = {}
-        
+        self.calculate_bmi = {}        
         # Initialize heart rate alert flag
         self.heart_rate_alert_shown = False
         
@@ -1596,8 +1599,8 @@ class ModernYogaApp(QMainWindow):
         self.setup_ui()
         
         # Load user profile after UI setup
-        self.load_user_profile()
-        
+        self.load_calculate_bmi()
+     
         self.poses_trained_value.setText(str(len(self.estimator.named_poses)))    
         
         # Initialize voice assistant
@@ -1605,8 +1608,8 @@ class ModernYogaApp(QMainWindow):
         
         # Welcome message with name if available
         welcome_msg = "Welcome to YogKalp. Your personal yoga and health assistant."
-        if "name" in self.user_profile and self.user_profile["name"]:
-            welcome_msg = f"Welcome {self.user_profile['name']} to YogKalp. Your personal yoga and health assistant."
+        if "name" in self.calculate_bmi and self.calculate_bmi["name"]:
+            welcome_msg = f"Welcome {self.calculate_bmi['nam']} to YogKalp. Your personal yoga and health assistant."
         self.voice_assistant.speak(welcome_msg)
             
         # Update Timer
@@ -1618,6 +1621,22 @@ class ModernYogaApp(QMainWindow):
         self.calorie_timer = QTimer()
         self.calorie_timer.timeout.connect(self.update_calories_burned)
         self.calorie_timer.start(5000)  # Updates every 5 seconds
+        
+    def speak_text(self, text):
+        """Use text-to-speech to speak the given text"""
+        # Create a separate thread for TTS to avoid UI freezing
+        def tts_thread_func(text_to_speak):
+            try:
+                engine = pyttsx3.init()
+                engine.say(text_to_speak)
+                engine.runAndWait()
+            except Exception as e:
+                print(f"TTS Error: {e}")
+                
+        # Start TTS in a separate thread
+        tts_thread = threading.Thread(target=tts_thread_func, args=(text,))
+        tts_thread.daemon = True  # Thread will exit when main program exits
+        tts_thread.start()
         
     def setup_ui(self):
         central_widget = QWidget()
@@ -2231,6 +2250,7 @@ class ModernYogaApp(QMainWindow):
             self.accuracy_info.setText("Excellent form! Keep it up.")
             self.accuracy_info.setStyleSheet("color: #4CAF50;")  # Green
             current_level = "high"
+            
         elif accuracy > 60:
             self.accuracy_info.setText("Good form. Minor adjustments needed.")
             self.accuracy_info.setStyleSheet("color: #FFC107;")  # Yellow/Orange
@@ -2387,11 +2407,15 @@ class ModernYogaApp(QMainWindow):
             self.voice_assistant.speak("Voice assistant enabled")
             
     def show_food_recommendations(self):
+        """Display food recommendations based on user's BMI"""
         try:
             if self.weight_input.text() and self.height_input.text():
                 weight = float(self.weight_input.text())
                 height = float(self.height_input.text()) / 100
                 bmi = weight / (height * height)
+                
+                # Announce the personalized message using text-to-speech
+                self.voice_assistant.speak("Your Personalized food plan as per your BMI")
                 
                 # Create and show the recommendations window
                 self.food_window = IndianFoodRecommendations(bmi)
@@ -2420,13 +2444,13 @@ class ModernYogaApp(QMainWindow):
                 age = 19
                 gender_factor = 1
                 
-                if "age" in self.user_profile and self.user_profile["age"]:
+                if "age" in self.calculate_bmi and self.calculate_bmi["age"]:
                     try:
-                        age = int(self.user_profile["age"])
+                        age = int(self.calculate_bmi["age"])
                     except:
                         pass
-                if "gender" in self.user_profile and self.user_profile["gender"]:
-                    if self.user_profile["gender"] == "Female":
+                if "gender" in self.calculate_bmi and self.calculate_bmi["gener"]:
+                    if self.calculate_bmi["gener"] == "Female":
                         gender_factor = 0  
  
                 # Calculate BMI
@@ -2502,7 +2526,7 @@ class ModernYogaApp(QMainWindow):
 
     def show_profile(self):
         """Show the user profile dialog"""
-        self.profile_dialog = UserProfileDialog(self, self.user_profile)
+        self.profile_dialog = UserProfileDialog(self, self.calculate_bmi)
         self.profile_dialog.profile_updated.connect(self.on_profile_updated)
         # Make the dialog modal to prevent interaction with main window
         self.profile_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -2510,7 +2534,7 @@ class ModernYogaApp(QMainWindow):
         
     def on_profile_updated(self, profile_data):
         """Handle updated profile data"""
-        self.user_profile = profile_data
+        self.calculate_bmi = profile_data
         
         # Update weight and height inputs if they exist
         if "weight" in profile_data and profile_data["weight"]:
@@ -2522,19 +2546,19 @@ class ModernYogaApp(QMainWindow):
         # Calculate BMI if both weight and height are available
         self.calculate_bmi()
         
-    def load_user_profile(self):
+    def load_calculate_bmi(self):
         """Load user profile from file if it exists"""
         try:
             if os.path.exists("user_data/profile.json"):
                 with open("user_data/profile.json", "r") as f:
-                    self.user_profile = json.load(f)
+                    self.calculate_bmi = json.load(f)
                     
                 # Update weight and height inputs if they exist
-                if "weight" in self.user_profile and self.user_profile["weight"]:
-                    self.weight_input.setText(self.user_profile["weight"])
+                if "weight" in self.calculate_bmi and self.calculate_bmi["weiht"]:
+                    self.weight_input.setText(self.calculate_bmi["weiht"])
                 
-                if "height" in self.user_profile and self.user_profile["height"]:
-                    self.height_input.setText(self.user_profile["height"])
+                if "height" in self.calculate_bmi and self.calculate_bmi["heiht"]:
+                    self.height_input.setText(self.calculate_bmi["heiht"])
         except Exception as e:
             print(f"Error loading user profile: {e}")
             
@@ -2563,9 +2587,11 @@ class ModernYogaApp(QMainWindow):
                     self.bmi = bmi
         except Exception as e:
             print(f"Error calculating BMI: {e}")
+
 # ---------------------------
 # Main Application
 # ---------------------------
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     
