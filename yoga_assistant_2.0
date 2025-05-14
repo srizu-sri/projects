@@ -54,7 +54,7 @@ class WebSearchThread(QThread):
             - General healthcare information
             - Wellness practices and lifestyle choices
 
-            Keep the response not too long and concise.
+            Keep the response under one paragraph.
             Keep the response clear, informative, and focused on evidence-based information.
             If the query is about a medical condition, include a disclaimer that this is general information and not medical advice."""
             
